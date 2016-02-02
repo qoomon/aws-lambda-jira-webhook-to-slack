@@ -55,8 +55,8 @@ exports.handler = function(webhook, context) {
       "title_link": webhook.issue.url,
     };
     
+    attachment.fields = [];
     if(webhook.changelog && webhook.changelog.items) {
-        attachment.fields = [];
         webhook.changelog.items.forEach(function(item){
             var field = {
               "title": item.field,
@@ -65,6 +65,14 @@ exports.handler = function(webhook, context) {
             };
             attachment.fields.push(field);
         });
+    }
+    if(webhook.comment) {
+        var comment = {
+          "title": "Comment",
+          "value": webhook.comment.body,
+          "short": false
+        };
+        attachment.fields.push(comment);
     }
     slackRequestContent.attachments.push(attachment);
     
