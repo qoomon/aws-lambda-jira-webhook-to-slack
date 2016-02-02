@@ -18,11 +18,11 @@ exports.handler = function(webhook, context) {
 
     // https://developer.atlassian.com/static/connect/docs/latest/modules/common/webhook.html
     if(webhook.webhookEvent == "jira:issue_created"){
-        eventString = "Created";  
+        eventString = "created";  
         eventColor = '#4a6785';
     }
     if(webhook.webhookEvent == "jira:issue_updated"){
-        eventString = "Updated"; 
+        eventString = "updated"; 
         if(webhook.issue.fields.status.statusCategory.key == "new") {
             eventColor = '#4a6785';
         }
@@ -34,16 +34,16 @@ exports.handler = function(webhook, context) {
         }
     }
     if(webhook.webhookEvent == "jira:issue_deleted"){
-        eventString = "Deleted"; 
+        eventString = "deleted"; 
         eventColor = '#cc0000';
     }
     if(webhook.webhookEvent == "jira:worklog_updated"){
-        eventString = "Worklog Changed";
+        eventString = "updated";
         eventColor = '#999999';
     }
     
     var slackRequestContent = {};
-    slackRequestContent.text = "*<" + webhook.user.url + "|" + webhook.user.displayName + ">*   " + eventString + "<" + webhook.issue.url + "|" + webhook.issue.key + ">   (<" + webhook.issue.fields.project.url + "|" + webhook.issue.fields.project.name + ">)";
+    slackRequestContent.text = "*<" + webhook.user.url + "|" + webhook.user.displayName + ">* " + eventString + " <" + webhook.issue.url + "|" + webhook.issue.key + ">   (<" + webhook.issue.fields.project.url + "|" + webhook.issue.fields.project.name + ">)";
     
     slackRequestContent.attachments= [];
 
