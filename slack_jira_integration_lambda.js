@@ -43,13 +43,13 @@ exports.handler = function(webhook, context) {
     }
     
     var slackRequestContent = {};
-    slackRequestContent.text = "*<" + webhook.user.url + "|" + webhook.user.displayName + ">*   " + eventString + "   (<" + webhook.issue.fields.project.url + "|" + webhook.issue.fields.project.name + ">)";
+    slackRequestContent.text = "*<" + webhook.user.url + "|" + webhook.user.displayName + ">*   " + eventString + "<" + webhook.issue.url + "|" + webhook.issue.key + ">   (<" + webhook.issue.fields.project.url + "|" + webhook.issue.fields.project.name + ">)";
     
     slackRequestContent.attachments= [];
 
     var attachment = {
       "color": eventColor,
-      "title": "<" + webhook.issue.url + "|" + webhook.issue.key + ">   " +webhook.issue.fields.summary,
+      "title": webhook.issue.fields.summary,
       "title_link": webhook.issue.url,
     };
     
