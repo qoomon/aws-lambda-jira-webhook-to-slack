@@ -59,7 +59,7 @@ exports.handler = function(webhook, context) {
     attachment.fields = [];
     if(webhook.changelog && webhook.changelog.items) {
         webhook.changelog.items.forEach(function(item){
-            if(excludeFields.indexOf(item.field) >= 0){
+            if(excludeFields.indexOf(item.field) < 0){
                 var field = {
                   "title": item.field,
                   "value": item.toString || "-",
