@@ -3,7 +3,10 @@ var https = require('https');
 
 var slackWebHookUrl = "https://hooks.slack.com/services/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";
 
+var excludeFields = ["Rank"];
+
 exports.handler = function(webhook, context) {
+    
     console.log(JSON.stringify(webhook,2,2));
 
     var userSelfUrl = url.parse(webhook.user.self);
@@ -56,8 +59,7 @@ exports.handler = function(webhook, context) {
     attachment.fields = [];
     if(webhook.changelog && webhook.changelog.items) {
         webhook.changelog.items.forEach(function(item){
-            var excludeFields = [1, 2, "bar"];
-            if(!excludeFields.includes(item.field)){
+            if(excludeFields.indexOf(item.field) >= 0){
                 var field = {
                   "title": item.field,
                   "value": item.toString || "-",
