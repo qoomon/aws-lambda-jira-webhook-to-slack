@@ -48,15 +48,14 @@ exports.handler = function(webhook, context) {
     var slackRequestContent = {};
     slackRequestContent.text = "*<" + webhook.user.url + "|" + webhook.user.displayName + ">* " + eventString + " <" + webhook.issue.url + "|" + webhook.issue.key + ">   (<" + webhook.issue.fields.project.url + "|" + webhook.issue.fields.project.name + ">)";
     
-    slackRequestContent.attachments= [];
-
-    var attachment = {
-      "color": eventColor,
-      "title": webhook.issue.fields.summary,
-      "title_link": webhook.issue.url,
-    };
+    var attachment = {};
+    slackRequestContent.attachments= [attachment];
     
+    attachment.color = eventColor;
+    attachment.title = webhook.issue.fields.summary;
+    attachment.title_link = webhook.issue.url;
     attachment.fields = [];
+    
     if(webhook.changelog && webhook.changelog.items) {
         webhook.changelog.items.forEach(function(item){
             if(excludeFields.indexOf(item.field) < 0){
@@ -69,6 +68,7 @@ exports.handler = function(webhook, context) {
             }
         });
     }
+    
     if(webhook.comment) {
         var comment = {
           "title": "Comment",
@@ -77,37 +77,40 @@ exports.handler = function(webhook, context) {
         };
         attachment.fields.push(comment);
     }
-    slackRequestContent.attachments.push(attachment);
-    
-    var slackRequestUrl = url.parse(slackWebHookUrl);
-    var slackRequestOptions = {
-        host: slackRequestUrl.host,
-        port: slackRequestUrl.port || '443',
-        path: slackRequestUrl.path,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-    };
-    var slackRequest = https.request(slackRequestOptions, function(response){
-        var data = '';
-
-        //another chunk of data has been recieved, so append it to `str`
-        response.on('data', function (chunk) {
-            data += chunk;
-        });
-
-        response.on('end', function () {
-            if(200 <= response.statusCode && response.statusCode < 300){
-                context.succeed(response.statusCode + " => " + data);
-            } else {
-                 context.fail(response.statusCode + " => " + data);
+   
+    if(webhook.webhookEvent == "jira:issue_updated" && attachment.fields.length === 0){
+        context.succeed("skip empty update event");    
+    } else {
+        var slackRequestUrl = url.parse(slackWebHookUrl);
+        var slackRequestOptions = {
+            host: slackRequestUrl.host,
+            port: slackRequestUrl.port || '443',
+            path: slackRequestUrl.path,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
             }
+        };
+        var slackRequest = https.request(slackRequestOptions, function(response){
+            var data = '';
+    
+            //another chunk of data has been recieved, so append it to `str`
+            response.on('data', function (chunk) {
+                data += chunk;
+            });
+    
+            response.on('end', function () {
+                if(200 <= response.statusCode && response.statusCode < 300){
+                    context.succeed(response.statusCode + " => " + data);
+                } else {
+                     context.fail(response.statusCode + " => " + data);
+                }
+            });
+    
         });
-
-    });
-    slackRequest.on('error', context.fail);
-    console.log(JSON.stringify(slackRequestContent,2,2));
-    slackRequest.write(JSON.stringify(slackRequestContent));
-    slackRequest.end();
+        slackRequest.on('error', context.fail);
+        console.log(JSON.stringify(slackRequestContent,2,2));
+        slackRequest.write(JSON.stringify(slackRequestContent));
+        slackRequest.end();
+    }
 };
