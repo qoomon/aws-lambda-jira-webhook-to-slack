@@ -56,12 +56,15 @@ exports.handler = function(webhook, context) {
     attachment.fields = [];
     if(webhook.changelog && webhook.changelog.items) {
         webhook.changelog.items.forEach(function(item){
-            var field = {
-              "title": item.field,
-              "value": item.toString || "-",
-              "short": false
-            };
-            attachment.fields.push(field);
+            var excludeFields = [1, 2, "bar"];
+            if(!excludeFields.includes(item.field)){
+                var field = {
+                  "title": item.field,
+                  "value": item.toString || "-",
+                  "short": false
+                };
+                attachment.fields.push(field);
+            }
         });
     }
     if(webhook.comment) {
