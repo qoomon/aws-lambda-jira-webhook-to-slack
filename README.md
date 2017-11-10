@@ -1,2 +1,2 @@
-# slack_jira_integration_aws_lambda
-Slack Integration through Jira Webhooks
+# aws-lambda-jira-webhook-to-slack
+Slack Integration for Jira Webhooks
